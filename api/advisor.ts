@@ -14,7 +14,7 @@
 const DEFAULT_BASE_URL = 'https://api.tokenfactory.nebius.com/v1';
 const DEFAULT_MODEL = 'nvidia/Llama-3_1-Nemotron-Ultra-253B-v1';
 const MAX_BODY_BYTES = 16_000;
-const UPSTREAM_TIMEOUT_MS = 25_000;
+const UPSTREAM_TIMEOUT_MS = 40_000;
 
 interface AdvisorRecommendation {
   title: string;
@@ -126,7 +126,7 @@ export async function POST(request: Request): Promise<Response> {
         model,
         messages: buildMessages(payload),
         temperature: 0.3,
-        max_tokens: 400,
+        max_tokens: 2000,
       }),
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
@@ -136,7 +136,10 @@ export async function POST(request: Request): Promise<Response> {
     const data = (await upstream.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
     };
-    const advice = data.choices?.[0]?.message?.content?.trim();
+    // Reasoning models may prefix the answer with <think>...</think>; drop it.
+    const advice = data.choices?.[0]?.message?.content
+      ?.replace(/<think>[\s\S]*?<\/think>/g, '')
+      .trim();
     if (!advice) return json({ error: 'empty_response' }, 502);
 
     return json({ advice, model });
