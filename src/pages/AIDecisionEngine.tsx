@@ -63,16 +63,16 @@ export default function AIDecisionEngine() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-10">
-      <div className="flex items-center justify-between mb-7">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-7">
         <div>
-          <div className="font-semibold text-4xl tracking-tighter">Decision Engine (Rule-Based)</div>
+          <div className="font-semibold text-3xl sm:text-4xl tracking-tighter">Decision Engine (Rule-Based)</div>
           <div className="text-xl text-slate-500">Explainable multi-objective recommendations</div>
         </div>
         <button 
           onClick={regenerateRecommendations}
           disabled={isGenerating}
-          className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all"
+          className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-3xl px-6 py-3 text-sm font-semibold shadow-sm hover:shadow-md transition-all disabled:opacity-60"
         >
           {isGenerating ? 'REGENERATING...' : 'REGENERATE RECOMMENDATIONS'} 
           <TrendingUp className="w-4 h-4" />

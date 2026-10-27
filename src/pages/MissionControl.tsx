@@ -13,14 +13,18 @@ export default function MissionControl() {
     highRisk: currentSatelliteData.filter(p => p.salinity > 6).length,
   };
 
+  const today = new Date()
+    .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    .toUpperCase();
+
   return (
-    <div className="max-w-7xl mx-auto px-8 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="px-3 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full">LIVE • 03 JUL 2026</div>
-            <div className="font-semibold tracking-tighter text-5xl">Mission Control</div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <div className="px-3 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full whitespace-nowrap">LIVE • {today}</div>
+            <div className="font-semibold tracking-tighter text-3xl sm:text-5xl">Mission Control</div>
           </div>
           <div className="text-lg text-slate-500 mt-1">Real-time satellite data ingestion &amp; decision pipeline</div>
         </div>
@@ -29,9 +33,9 @@ export default function MissionControl() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Live Status */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all">
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-8">
             <div>
               <div className="font-semibold">Live Operations Status</div>
@@ -45,7 +49,7 @@ export default function MissionControl() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6">
             {[
               { label: 'Satellite Points', value: liveMetrics.points, icon: MapPin },
               { label: 'Provinces Covered', value: liveMetrics.provinces, icon: Users },

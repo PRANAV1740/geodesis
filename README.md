@@ -1,316 +1,126 @@
 # Geodesis
 
-> **Geospatial Digital Twin for Climate-Resilient Agriculture**
+Geospatial digital twin for climate-resilient agriculture in the Vietnamese Mekong Delta.
 
 [![CI](https://github.com/Rhytam23/geodesis/actions/workflows/ci.yml/badge.svg)](https://github.com/Rhytam23/geodesis/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-5-purple.svg)](https://vitejs.dev)
 
-Geodesis is a **map-first, AI-powered geospatial digital twin** for the Vietnamese Mekong Delta. It delivers an immersive **Location → Scenario → Simulation → Insights → Export** experience that reacts in real time as you explore the map or scrub the climate timeline.
+Click the map or move the climate timeline and every metric, recommendation and chart updates: **Location → Scenario → Simulation → Insights → Export**.
 
-**Built for:**
-- 🌾 Farmers & Cooperatives
-- 🏛️ Government analysts (MARD, MONRE)
-- 🔬 Researchers
-- 🏆 Hackathon demonstrations & portfolio showcase
-
----
-
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---------|-------------|
-| **Interactive GIS Map** | Leaflet-powered with Satellite, OSM, Terrain, and Dark base layers; province/district boundaries; salinity & NDVI heatmaps; click-to-select with flyTo animation |
-| **Live Digital Twin** | Timeline scrubber (2026–2050): every metric, recommendation, and chart reacts instantly as you move through time |
-| **Explainable AI Engine** | 5-factor weighted scoring (weather, soil, market, satellite, historical) — every number carries its formula, confidence, and source |
-| **Economic Modelling** | Revenue / Cost / Profit comparison, ROI, payback period, subsidy eligibility, co-operative proximity |
-| **Scenario Builder** | Adjust rainfall, salinity, and AWD adoption with live sliders; run simulation to update the full twin |
-| **Role Dashboards** | Dedicated views for Farmer, Cooperative, Government (enterprise command centre), Researcher |
-| **Demo Mode** | 5 deterministic scenarios (Normal, Flood, Drought, High Salinity, Government Response) — perfect for live demos |
-| **Transparent Data** | Every value carries: source, confidence %, last updated, and known limitations |
+| Interactive GIS map | Leaflet map with satellite, OSM, terrain and dark layers, province boundaries and salinity/NDVI heatmaps |
+| Timeline | Scrub 2026–2050; all values react instantly |
+| Explainable decision engine | Weighted scoring (weather, soil, market, satellite, history); each number shows its formula, confidence and source |
+| Economic modelling | Revenue, cost, profit, ROI, payback and subsidy eligibility |
+| Scenario builder | Adjust rainfall, salinity and AWD adoption with live sliders |
+| Role dashboards | Farmer, cooperative, government and researcher views |
+| AI advisor | Optional plain-language explanation of a recommendation from an NVIDIA Nemotron model (see below) |
+| Demo mode | Five deterministic scenarios: normal, flood, drought, high salinity, government response |
 
----
-
-## 🚀 Quick Start
+## Quick start
 
 ```bash
-# 1. Clone
 git clone https://github.com/Rhytam23/geodesis.git
 cd geodesis
-
-# 2. Install
 npm install
-
-# 3. Start dev server
 npm run dev
 ```
 
-Open **[http://localhost:3000/workspace](http://localhost:3000/workspace)** — the Workspace is the primary experience.
+Open <http://localhost:3000/workspace>. No API keys are needed; live data sources fall back to demonstration data if unreachable.
 
-> No API keys are required. Live APIs fall back gracefully to demonstration data.
-
----
-
-## 📦 Technology Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 18 + TypeScript 5 |
-| Build | Vite 5 (code-split bundles) |
-| Map | Leaflet 1.9 + React-Leaflet 4 |
-| Charts | Recharts 2 |
-| Styling | Tailwind CSS 3 + design tokens |
-| Animation | Framer Motion 11 |
-| State | React Context + custom hooks |
-| Routing | React Router 6 |
-| Toasts | Sonner |
-| Deployment | Vercel (recommended) / Docker / static |
-
----
-
-## 🏗️ Architecture
-
-```
-User clicks map (lat/lng)
-        │
-        ▼
-useLocationData(lat, lng)          ← 6 parallel service calls (cached)
-  ├── weatherService  → Open-Meteo API
-  ├── soilService     → ISRIC SoilGrids
-  ├── adminService    → Nominatim (OSM)
-  ├── marketService   → MARD/VFA data (demonstration)
-  ├── cropService     → local crop database
-  └── governmentService → provincial programs
-        │
-        ▼
-decisionEngine.generateRecommendations(input)
-  → 4 crops × 7 factors × weighted confidence
-        │
-        ▼
-economicService.calculateEconomicComparison(...)
-  → revenue / cost / profit / payback / subsidy
-        │
-        ▼
-All UI panels update reactively (no page reload)
-```
-
-**Core principle**: All business values flow through `useGeodesisTwin`. No hardcoded numbers in the UI.
-
----
-
-## 📁 Project Structure
-
-```
-geodesis/
-├── src/
-│   ├── components/
-│   │   ├── workspace/           # Digital Twin workspace components
-│   │   │   ├── layout/          # TopNavigation, WorkspaceLayout
-│   │   │   ├── map/             # Map panel
-│   │   │   ├── right-panel/     # Insights + details panel
-│   │   │   ├── sidebar/         # Location, scenario, timeline panels
-│   │   │   └── timeline/        # Year scrubber
-│   │   ├── dashboards/          # Role-specific dashboards
-│   │   ├── shared/              # Shared UI components
-│   │   ├── ProfessionalGISMap.tsx
-│   │   ├── DecisionIntelligence.tsx
-│   │   ├── EconomicDecision.tsx
-│   │   └── ErrorBoundary.tsx
-│   ├── context/
-│   │   ├── DemoModeContext.tsx   # 5 demo scenarios
-│   │   ├── RoleContext.tsx       # Role-based access
-│   │   ├── WorkspaceProviders.tsx
-│   │   ├── TimelineContext.tsx
-│   │   ├── ScenarioContext.tsx
-│   │   ├── UIContext.tsx
-│   │   └── WorkspaceContext.tsx
-│   ├── hooks/
-│   │   ├── useGeodesisTwin.ts   # Central twin orchestration
-│   │   └── useLocationData.ts   # Data fetching hook
-│   ├── integrations/            # Adapters (simulation, decision, map)
-│   ├── pages/                   # Route-level page components
-│   ├── services/                # Deterministic engines + API clients
-│   │   ├── decisionEngine.ts    # Explainable AI core (never modify lightly)
-│   │   ├── economicService.ts   # Financial modelling
-│   │   ├── weatherService.ts    # Open-Meteo client
-│   │   ├── soilService.ts       # SoilGrids client
-│   │   ├── adminService.ts      # Nominatim client
-│   │   ├── marketService.ts     # Market prices
-│   │   ├── cropService.ts       # Crop database
-│   │   └── governmentService.ts # Provincial programs
-│   ├── types/                   # TypeScript interfaces
-│   ├── data/                    # Static mock data + generators
-│   ├── layouts/                 # Shell layouts (MainLayout)
-│   └── styles/                  # Design tokens
-├── docs/                        # Public documentation
-├── api/                         # OpenAPI specification
-├── tests/                       # Test scaffold
-├── scripts/                     # Deployment helpers
-├── .github/
-│   ├── workflows/ci.yml         # CI pipeline
-│   ├── ISSUE_TEMPLATE/          # Bug, feature, data issue templates
-│   └── PULL_REQUEST_TEMPLATE.md
-├── .env.example                 # Environment variable reference
-├── Dockerfile                   # Multi-stage production Docker image
-├── docker-compose.yml           # Local Docker setup
-├── vercel.json                  # Vercel deployment config + security headers
-├── vite.config.ts               # Build + code splitting config
-└── tailwind.config.js           # Design system tokens
-```
-
----
-
-## 🛠️ Development
-
-### Commands
+## Scripts
 
 ```bash
-npm run dev           # Dev server (http://localhost:3000)
-npm run build         # Production build
-npm run typecheck     # TypeScript check only
-npm run lint          # ESLint
-npm run lint:fix      # ESLint auto-fix
-npm run format        # Prettier
-npm run ci            # Full CI gate (typecheck + lint + build)
-npm run preview       # Preview production build
+npm run dev         # dev server
+npm run build       # production build
+npm run typecheck   # TypeScript check
+npm run lint        # ESLint
+npm run format      # Prettier
+npm test            # Vitest
+npm run ci          # typecheck + lint + test + build
 ```
 
-### Environment Variables
+## Environment variables
 
-Copy `.env.example` to `.env.local` and adjust as needed:
+Copy `.env.example` to `.env.local`. `.env.local` is git-ignored; never commit keys.
 
-```bash
-cp .env.example .env.local
-```
+### AI advisor (optional)
 
-All APIs are free and work without keys. See `.env.example` for full documentation.
+The advisor runs in a serverless function (`api/advisor.ts`) so the key never reaches the browser. It only explains recommendations from the rule-based engine; it does not change them. Without a key, the "Explain this" button reports that the advisor is not configured and everything else works.
 
----
-
-## 🚢 Deployment
-
-### Vercel (Recommended)
-
-```bash
-# Option A: Vercel CLI
-npm i -g vercel
-vercel
-
-# Option B: Import from GitHub
-# https://vercel.com/new → Import Repository
-```
-
-Set any required environment variables in the Vercel dashboard.
-
-### Docker
-
-```bash
-docker-compose up --build
-# Access at http://localhost:8080
-```
-
-### Static (any host)
-
-```bash
-npm run build
-# Upload dist/ to any static host (Netlify, GitHub Pages, S3, nginx)
-```
-
-See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
-
----
-
-## 📚 Documentation
-
-| Document | Description |
+| Variable | Description |
 |----------|-------------|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture and data flow |
-| [docs/DEVELOPER_GUIDE.md](./docs/DEVELOPER_GUIDE.md) | Developer onboarding and patterns |
-| [docs/USER_GUIDE.md](./docs/USER_GUIDE.md) | End-user guide by role |
-| [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | Vercel, Docker, static deployment |
-| [docs/ROADMAP.md](./docs/ROADMAP.md) | Feature roadmap |
-| [api/openapi.yaml](./api/openapi.yaml) | Machine-readable OpenAPI spec |
+| `NEBIUS_API_KEY` | API key for an OpenAI-compatible chat endpoint |
+| `NEBIUS_MODEL` | Model ID, e.g. `nvidia/nemotron-3.5-lightning-30b-a3b` |
+| `NEBIUS_BASE_URL` | Endpoint base URL, e.g. `https://integrate.api.nvidia.com/v1` |
 
----
+Do not prefix these with `VITE_`. Set them in `.env.local` and run `vercel dev` to try the advisor locally, or add them under Vercel → Project Settings → Environment Variables and redeploy.
 
-## 🔌 External APIs
+## Architecture
 
-| Service | Purpose | Key Required | Free Tier |
-|---------|---------|-------------|-----------|
-| [Open-Meteo](https://open-meteo.com) | Real-time weather | ❌ No | ✅ Unlimited |
-| [ISRIC SoilGrids v2.0](https://rest.isric.org) | Soil properties | ❌ No | ✅ Unlimited |
-| [OpenStreetMap Nominatim](https://nominatim.org) | Reverse geocoding | ❌ No | ✅ 1 req/sec |
+```
+map click (lat/lng)
+   └─ useLocationData        weather, soil, admin, market, crop, government (parallel, cached)
+        └─ decisionEngine    crop recommendations with weighted confidence
+             └─ economicService   revenue / cost / profit / payback / subsidy
+                  └─ UI panels update reactively
+```
 
-All APIs fall back to deterministic demonstration data if unavailable.
+All business values flow through `useGeodesisTwin`.
 
----
+## Project structure
 
-## 🤝 Contributing
+```
+src/
+  components/   workspace, dashboards, shared UI, map
+  context/      demo mode, role, timeline, scenario, UI state
+  hooks/        useGeodesisTwin, useLocationData
+  integrations/ simulation, decision, map adapters
+  pages/        route-level pages
+  services/     decision engine, economics, API clients, AI advisor
+  types/        TypeScript interfaces
+api/            advisor function + OpenAPI spec
+tests/          Vitest tests
+docs/           architecture, developer guide, deployment
+```
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
+## Tech stack
 
-**Priority contributions:**
-- Real MARD / MONRE data integration
-- Google Earth Engine satellite scripts
-- Vietnamese language (vi) UI support
-- Unit tests for `decisionEngine.ts`
-- Mobile PWA improvements
+React 18, TypeScript 5, Vite 5, Leaflet, Recharts, Tailwind CSS, Framer Motion, React Router 6, Vitest.
 
----
+## Data sources
 
-## 🗺️ Roadmap
+| Service | Purpose | Key |
+|---------|---------|-----|
+| [Open-Meteo](https://open-meteo.com) | Weather | none |
+| [ISRIC SoilGrids](https://rest.isric.org) | Soil properties | none |
+| [OpenStreetMap Nominatim](https://nominatim.org) | Reverse geocoding (1 req/sec) | none |
 
-**v1.1 (planned)**
-- Backend REST API layer (Node.js / Go)
-- Real SMS gateway (VNPT / Twilio)
-- Google Earth Engine direct ingestion
-- Authentication & user profiles
-- Offline support + PWA
-- Vietnamese UI language toggle
-- Expanded crop models
+## Deployment
 
-See [docs/ROADMAP.md](./docs/ROADMAP.md) for details.
+```bash
+vercel                      # Vercel CLI
+docker-compose up --build   # Docker, http://localhost:8080
+npm run build               # static output in dist/
+```
 
----
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md).
 
-## 🔒 Security
+## Documentation
 
-See [SECURITY.md](./SECURITY.md) to report vulnerabilities responsibly.
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Developer guide](./docs/DEVELOPER_GUIDE.md)
+- [User guide](./docs/USER_GUIDE.md)
+- [Roadmap](./docs/ROADMAP.md)
+- [OpenAPI spec](./api/openapi.yaml)
 
----
+## Contributing and security
 
-## 📄 License
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Report vulnerabilities as described in [SECURITY.md](./SECURITY.md).
 
-[MIT](./LICENSE) — © 2026 Geodesis Team
+## License
 
----
-
-*Satellite intelligence. Transparent reasoning. Instant understanding.*
-
-> **Note**: This repository contains only production code and public documentation. Internal engineering artifacts, sprint plans, and AI workflow guides are in the private master repository (never committed here).
-
----
-
-## 📖 Project Understanding (Future Reference)
-
-A map-first geospatial digital twin for climate-resilient agriculture in the Mekong Delta: an
-interactive Leaflet map with a 2026–2050 timeline scrubber, a 5-factor explainable scoring
-engine (weather/soil/market/satellite/history), economic modelling (ROI, payback, subsidy
-eligibility), and role-specific dashboards. Its own README already lists "Hackathon
-demonstrations & portfolio showcase" as an intended audience, alongside farmers, government
-analysts and researchers.
-
-**Stack:** React 18 + TypeScript + Vite + Leaflet, MIT licensed, CI on GitHub Actions.
-**Status:** polished hackathon/portfolio project — confirmed by its own README, complete with
-demo mode and CI badge.
-
-## 🎯 Where This Can Be Used
-
-- Climate-tech / agri-tech hackathon or portfolio showcase — this is explicitly what it was
-  built for.
-- Reference for building an explainable, source-and-confidence-annotated scoring engine over
-  live geospatial data.
-- **Hackathons:** yes, by design. The 5 deterministic demo scenarios and role dashboards are
-  ready for a live pitch with no setup risk.
+[MIT](./LICENSE)
