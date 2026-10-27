@@ -67,11 +67,11 @@ export default function LiveOperations() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-10">
-      <div className="flex items-center justify-between mb-7">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-7">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="font-semibold text-5xl tracking-tighterer">Live Operations Center</div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="font-semibold text-3xl sm:text-5xl tracking-tighter">Live Operations Center</div>
             <div className="px-3 text-xs py-1 bg-red-100 text-red-700 rounded-full font-bold">LIVE</div>
           </div>
           <div className="text-xl text-slate-500">Real-time monitoring, alerting and dispatch</div>
@@ -84,8 +84,8 @@ export default function LiveOperations() {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         {/* Live Map + Stats */}
         <div className="xl:col-span-7">
-          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all">
-            <div className="px-8 pt-5 pb-3 flex justify-between">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-sm hover:shadow-md transition-all">
+            <div className="pb-3 flex flex-wrap gap-2 justify-between">
               <div>
                 <div className="font-semibold">Live Satellite Feed</div>
                 <div className="text-xs text-slate-500">Updating every 3.8s • 10 provinces</div>
@@ -101,7 +101,7 @@ export default function LiveOperations() {
         {/* Operations Stats */}
         <div className="xl:col-span-5 space-y-6">
           <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all">
-            <div className="font-semibold mb-4">OPERATIONS DASHBOARD</div>
+            <div className="font-semibold mb-4 text-sm">OPERATIONS DASHBOARD</div>
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: "Active Farmers Monitored", val: "278,900" },
@@ -138,9 +138,9 @@ export default function LiveOperations() {
             <button onClick={() => setAlerts(mockSMSAlerts)} className="text-sm text-emerald-700">Reset Demo</button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
             {/* Send New */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all">
+            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-sm hover:shadow-md transition-all">
               <div className="font-semibold mb-3">Dispatch New Alert</div>
               <div className="space-y-3">
                 <input 
@@ -169,30 +169,36 @@ export default function LiveOperations() {
                   <Send className="w-4 h-4" /> {sending ? 'SENDING...' : 'SEND SMS ALERT'}
                 </button>
               </div>
-              <div className="text-[10px] text-center mt-3 text-slate-500">Preview shown below • Production uses authenticated SMS gateway</div>
+              <div className="text-xs text-center mt-3 text-slate-500">Preview shown below • Production uses authenticated SMS gateway</div>
             </div>
 
             {/* Alerts Feed */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all">
+            <div className="lg:col-span-3 min-w-0 bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center gap-2 mb-3 text-xs uppercase font-semibold text-slate-500">RECENT ALERTS • {alerts.length}</div>
               
-              <div className="space-y-3 max-h-[325px] overflow-auto pr-1">
+              {demoSmsMessage && (
+                <div className="mb-3 rounded-3xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs leading-snug text-emerald-900 break-words">
+                  <div className="font-semibold mb-1">DEMO SCENARIO PREVIEW</div>
+                  {demoSmsMessage}
+                </div>
+              )}
+              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
                 {alerts.map((alert) => (
                   <div key={alert.id} className="border bg-slate-50 rounded-3xl px-4 py-3.5 text-sm">
-                    <div className="flex justify-between">
+                    <div className="flex flex-wrap justify-between gap-x-3 gap-y-2">
                       <div className="font-medium">{alert.recipient} <span className="text-xs text-slate-500">• {alert.phone}</span></div>
                       <div className="flex items-center gap-1.5">
                         {alert.status === 'delivered' ? (
-                          <span className="text-emerald-700 flex items-center text-xs font-medium"><CheckCircle className="w-3.5 h-3.5 mr-px" /> DELIVERED</span>
+                          <span className="text-emerald-700 flex items-center gap-1 text-xs font-medium whitespace-nowrap"><CheckCircle className="w-3.5 h-3.5" /> DELIVERED</span>
                         ) : (
-                          <button onClick={() => markDelivered(alert.id)} className="text-[10px] px-2 py-px bg-white rounded border text-emerald-700">MARK DELIVERED</button>
+                          <button onClick={() => markDelivered(alert.id)} className="text-[10px] px-2 py-0.5 bg-white rounded border text-emerald-700 whitespace-nowrap">MARK DELIVERED</button>
                         )}
                         <span className={`text-xs font-medium uppercase px-2 py-px rounded ${alert.priority === 'high' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'}`}>{alert.priority}</span>
                       </div>
                     </div>
-                    <div className="text-xs leading-snug text-slate-600 mt-1.5 pr-3">
-              {demoSmsMessage || alert.message}
-            </div>
+                    <div className="text-xs leading-snug text-slate-600 mt-1.5 break-words">
+                      {alert.message}
+                    </div>
                     <div className="text-[10px] text-slate-400 mt-2">{alert.timestamp}</div>
                   </div>
                 ))}
