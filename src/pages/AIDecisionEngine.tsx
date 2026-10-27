@@ -4,6 +4,7 @@ import { Recommendation } from '../types';
 import { CheckCircle, TrendingUp, ArrowRight } from 'lucide-react';
 import { useDemoMode } from '../context/DemoModeContext';
 import { toast } from 'sonner';
+import AdvisorPanel from '../components/AdvisorPanel';
 
 export default function AIDecisionEngine() {
   const demo = useDemoMode();
@@ -179,6 +180,8 @@ export default function AIDecisionEngine() {
                 <div className="text-emerald-800 font-medium mb-0.5">PREDICTED OUTCOME</div>
                 {selectedRec.predictedOutcome}
               </div>
+
+              <AdvisorPanel recommendation={selectedRec} />
 
               {/* Action + SMS */}
               <div className="flex items-center gap-3 mt-6">
