@@ -131,7 +131,12 @@ export async function POST(request: Request): Promise<Response> {
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
 
-    if (!upstream.ok) return json({ error: 'upstream_error', status: upstream.status }, 502);
+    if (!upstream.ok) {
+      // Provider error text never contains our key; surface a short excerpt for debugging.
+      const detail = (await upstream.text().catch(() => '')).slice(0, 300);
+      console.error('advisor upstream error', upstream.status, detail);
+      return json({ error: 'upstream_error', status: upstream.status, detail, model, host: new URL(baseUrl).host }, 502);
+    }
 
     const data = (await upstream.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
