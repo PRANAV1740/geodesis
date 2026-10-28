@@ -3,12 +3,35 @@ import type { Recommendation } from '../types';
 export interface AdvisorResult {
   advice: string;
   model: string;
+  provider?: string;
 }
 
 export class AdvisorUnavailableError extends Error {
-  constructor(public readonly reason: string) {
+  /** Machine-readable reason code from the backend */
+  public readonly reason: string;
+  /** Upstream HTTP status if available */
+  public readonly upstreamStatus?: number;
+  /** Safe detail string for local debugging */
+  public readonly detail?: string;
+  /** Upstream provider name (e.g., 'NVIDIA API Catalog' or 'Nebius Token Factory') */
+  public readonly provider?: string;
+  /** Upstream model identifier */
+  public readonly model?: string;
+
+  constructor(
+    reason: string,
+    upstreamStatus?: number,
+    detail?: string,
+    provider?: string,
+    model?: string,
+  ) {
     super(`AI advisor unavailable: ${reason}`);
     this.name = 'AdvisorUnavailableError';
+    this.reason = reason;
+    this.upstreamStatus = upstreamStatus;
+    this.detail = detail;
+    this.provider = provider;
+    this.model = model;
   }
 }
 
@@ -52,11 +75,28 @@ export async function getAdvisorNarrative(
   }
 
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new AdvisorUnavailableError(body.error ?? `http_${res.status}`);
+    const body = (await res.json().catch(() => ({}))) as {
+      error?: string;
+      status?: number;
+      detail?: string;
+      model?: string;
+      provider?: string;
+      host?: string;
+    };
+    throw new AdvisorUnavailableError(
+      body.error ?? `http_${res.status}`,
+      body.status,
+      body.detail,
+      body.provider,
+      body.model,
+    );
   }
 
   const data = (await res.json()) as Partial<AdvisorResult>;
-  if (!data.advice) throw new AdvisorUnavailableError('empty_response');
-  return { advice: data.advice, model: data.model ?? 'unknown' };
+  if (!data.advice) throw new AdvisorUnavailableError('empty_response', undefined, undefined, data.provider, data.model);
+  return {
+    advice: data.advice,
+    model: data.model ?? 'unknown',
+    provider: data.provider ?? 'NVIDIA API Catalog',
+  };
 }

@@ -28,8 +28,8 @@ describe('aiAdvisor', () => {
   });
 
   it('returns advice on success', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ advice: 'Plant early.', model: 'm' }) }));
-    await expect(getAdvisorNarrative(rec)).resolves.toEqual({ advice: 'Plant early.', model: 'm' });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ advice: 'Plant early.', model: 'm', provider: 'NVIDIA API Catalog' }) }));
+    await expect(getAdvisorNarrative(rec)).resolves.toEqual({ advice: 'Plant early.', model: 'm', provider: 'NVIDIA API Catalog' });
   });
 
   it('surfaces the server error code when unavailable', async () => {
